@@ -10,14 +10,11 @@ adapter = "MYSQLI"
 charset = "utf8mb4"
 
 [General]
-;enable_trusted_host_check = 0
-;force_ssl = 1                 ;please add this as well
-;assume_secure_protocol = 1
+assume_secure_protocol = 1
+enable_trusted_host_check = 0
+enable_plugin_upload = 1
 salt = "28258292af1a6b62556bedac5c01d093"
-trusted_hosts[] = "127.0.0.1:32010"
-; Uncomment line below if you use a standard proxy
-; proxy_client_headers[] = HTTP_X_FORWARDED_FOR
-; proxy_host_headers[] = HTTP_X_FORWARDED_HOST
+trusted_hosts[] = "#MTM_SUBDOMAIN"
 
 ; Uncomment line below if you use CloudFlare
 ;proxy_client_headers[] = HTTP_CF_CONNECTING_IP

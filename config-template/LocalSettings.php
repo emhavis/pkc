@@ -289,28 +289,39 @@ $wgFileExtensions = array_merge(
 enableSemantics();
 $wgEnableUploads = true;
 
-wfLoadExtension( 'MW-OAuth2Client' );
+// wfLoadExtension( 'MW-OAuth2Client' );
 # The following two lines contains information on Github's OAuth service. You will have to apply for your own information to get things to work.
-$wgOAuth2Client['client']['id'] = "588891bd88bff5e1576b";
-$wgOAuth2Client['client']['secret'] = "fb049711254297b6293c96afb3bba8ad5754ce1d";
+// $wgOAuth2Client['client']['id'] = "588891bd88bff5e1576b";
+// $wgOAuth2Client['client']['secret'] = "fb049711254297b6293c96afb3bba8ad5754ce1d";
 
-$wgOAuth2Client['configuration']['authorize_endpoint']     = 'https://github.com/login/oauth/authorize'; // Authorization URL
-$wgOAuth2Client['configuration']['access_token_endpoint']  = 'https://github.com/login/oauth/access_token'; // Token URL
-$wgOAuth2Client['configuration']['api_endpoint']           = 'https://api.github.com/user'; // URL to fetch user JSON
-$wgOAuth2Client['configuration']['redirect_uri'] = "#YOUR_FQDN/index.php/Special:OAuth2Client/callback";
-$wgOAuth2Client['configuration']['username'] = 'login'; // JSON path to username
-$wgOAuth2Client['configuration']['email'] = 'email'; // JSON path to email
-$wgOAuth2Client['configuration']['scopes'] = 'openid email profile'; //Permissions
-$wgOAuth2Client['configuration']['service_name'] = 'Oauth Registry'; // the name of your service
-$wgOAuth2Client['configuration']['service_login_link_text'] = 'Login through Github'; // the text of the login link
+// $wgOAuth2Client['configuration']['authorize_endpoint']     = 'https://github.com/login/oauth/authorize'; // Authorization URL
+// $wgOAuth2Client['configuration']['access_token_endpoint']  = 'https://github.com/login/oauth/access_token'; // Token URL
+// $wgOAuth2Client['configuration']['api_endpoint']           = 'https://api.github.com/user'; // URL to fetch user JSON
+// $wgOAuth2Client['configuration']['redirect_uri'] = "#YOUR_FQDN/index.php/Special:OAuth2Client/callback";
+// $wgOAuth2Client['configuration']['username'] = 'login'; // JSON path to username
+// $wgOAuth2Client['configuration']['email'] = 'email'; // JSON path to email
+// $wgOAuth2Client['configuration']['scopes'] = 'openid email profile'; //Permissions
+// $wgOAuth2Client['configuration']['service_name'] = 'Oauth Registry'; // the name of your service
+// $wgOAuth2Client['configuration']['service_login_link_text'] = 'Login through Github'; // the text of the login link
 
 // remove login and logout buttons for all users
-function StripLogin(&$personal_urls, &$wgTitle) {
-    unset( $personal_urls["login"] );
-    # unset( $personal_urls["logout"] );
-    unset( $personal_urls['anonlogin'] );
-    return true;
-}
+// function StripLogin(&$personal_urls, &$wgTitle) {
+//     unset( $personal_urls["login"] );
+//     # unset( $personal_urls["logout"] );
+//     unset( $personal_urls['anonlogin'] );
+//     return true;
+// }
 
-$wgHooks['PersonalUrls'][] = 'StripLogin';
+// $wgHooks['PersonalUrls'][] = 'StripLogin';
 
+// Keycloak Configuration
+wfLoadExtension( 'OpenIDConnect' );
+wfLoadExtension( 'PluggableAuth' );
+// // https://kck.anindhaloka.org/auth/realms/pkc-realm/.well-known/openid-configuration --> check here
+$wgOpenIDConnect_Config['#KCK_SUBDOMAIN/auth/realms/pkc-realm/'] = [
+  'clientID' => 'pkc-client',
+  'clientsecret' => 'd9ecdca8-ad69-4322-9452-ff725898eb03',
+  'scope' => [ 'openid', 'profile', 'email' ]
+];
+#
+$wgGroupPermissions['*']['autocreateaccount'] = true;
