@@ -96,6 +96,7 @@
       - {src: './script/cs-backup.sh', dest: './cs/cs-backup.sh'}
       - {src: './script/cs-restore.sh', dest: './cs/cs-restore.sh'}
       - {src: './script/update-sw.sh', dest: './cs/update-sw.sh'}
+      - {src: './script/mtm-sql.sh', dest: './cs/mtm-sql.sh'}
     become: true
 
   - name: Extract mountpoint.tar.gz
@@ -117,6 +118,7 @@
     loop:
       - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
       - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
+      - {src: './config/update-mtm-config.sql', dest: './cs/mountpoint/backup_restore/mariadb'}
     become: true
 #
 # User data management
@@ -152,6 +154,9 @@
     community.docker.docker_compose:
       project_src: cs
     register: output
+
+  - name: Execute the Matomo Keycloak Config 
+    command: "sh {{ ansible_env.PWD }}/cs/mtm-sql.sh" 
 
   - name: Execute the update script 
     command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"

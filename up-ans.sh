@@ -25,14 +25,17 @@ function prep_mw {
     echo "Prepare LocalSettings.php file"
     FQDN="$DEFAULT_TRANSPORT://www.$YOUR_DOMAIN"
     KCK_AUTH_FQDN="$DEFAULT_TRANSPORT://kck.$YOUR_DOMAIN"
-    # echo "$KCK_AUTH_FQDN"
+    MTM_FQDN="$DEFAULT_TRANSPORT://mtm.$YOUR_DOMAIN"
+    echo "$MTM_FQDN"
     #
     sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
     sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
     sed -i '' "s|#KCK_SUBDOMAIN|$KCK_AUTH_FQDN|g" ./config/LocalSettings.php
     #
-    cp ./config-template/config.ini.php ./config/config.ini.php
+    sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/config.ini.php > ./config/config.ini.php
+    # cp ./config-template/config.ini.php ./config/config.ini.php
     #
+    sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
 
 }
 ################################################################################
