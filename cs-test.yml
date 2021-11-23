@@ -1,0 +1,24 @@
+---
+- name: install and provisioning dockers Cleanslate Servers
+  hosts: all
+  become: yes
+
+  tasks:
+# Docker Post Installation, enable docker without sudo
+  - name: copy Application Configuration Files
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: false
+    loop:
+      - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
+      - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
+      - {src: './config/update-mtm-config.sql', dest: './cs/mountpoint/backup_restore/mariadb'}
+      - {src: './config/app.ini', dest: './cs/mountpoint/gitea/gitea/conf'}
+    become: true
+    
+  - name: Execute the Matomo Keycloak Config 
+    command: "sh {{ ansible_env.PWD }}/cs/mtm-sql.sh" 
+
+  - name: Execute the update script 
+    command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"

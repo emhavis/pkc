@@ -1,4 +1,4 @@
-USE Matomo;
+USE matomo;
 
 update  matomo_plugin_setting
 set     setting_value = 'https://kck.#YOUR_DOMAIN/auth/realms/pkc-realm/protocol/openid-connect/auth'
@@ -19,3 +19,9 @@ update  matomo_plugin_setting
 set     setting_value = 'https://kck.#YOUR_DOMAIN/auth/realms/pkc-realm/protocol/openid-connect/logout?redirect_uri=https://mtm.#YOUR_DOMAIN'
 where   plugin_name = 'LoginOIDC'
         and setting_name = 'endSessionUrl';
+
+USE gitea;
+
+UPDATE  login_source
+set     cfg = '{"Provider":"openidConnect","ClientID":"gitea-client","ClientSecret":"a82b18b0-8cdd-44be-b507-f15192202ddf","OpenIDConnectAutoDiscoveryURL":"https://kck.#YOUR_DOMAIN/auth/realms/pkc-realm/.well-known/openid-configuration","CustomURLMapping":{"AuthURL":"","TokenURL":"","ProfileURL":"","EmailURL":""},"IconURL":""}'
+where   id = 1

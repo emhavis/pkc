@@ -119,6 +119,7 @@
       - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
       - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
       - {src: './config/update-mtm-config.sql', dest: './cs/mountpoint/backup_restore/mariadb'}
+      - {src: './config/app.ini', dest: './cs/mountpoint/gitea/gitea/conf'}
     become: true
 #
 # User data management
@@ -160,3 +161,14 @@
 
   - name: Execute the update script 
     command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"
+
+# Docker Post Installation, enable docker without sudo
+  - name: Create group
+    group:
+      name: "docker"
+      state: present
+
+  - name: Adding user ubuntu
+    user: name=ubuntu
+          group=docker
+          append=yes

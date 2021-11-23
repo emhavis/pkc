@@ -26,7 +26,8 @@ function prep_mw {
     FQDN="$DEFAULT_TRANSPORT://www.$YOUR_DOMAIN"
     KCK_AUTH_FQDN="$DEFAULT_TRANSPORT://kck.$YOUR_DOMAIN"
     MTM_FQDN="$DEFAULT_TRANSPORT://mtm.$YOUR_DOMAIN"
-    echo "$MTM_FQDN"
+    GIT_FQDN="$DEFAULT_TRANSPORT://git.$YOUR_DOMAIN"
+    # echo "$MTM_FQDN"
     #
     sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
     sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
@@ -36,6 +37,8 @@ function prep_mw {
     # cp ./config-template/config.ini.php ./config/config.ini.php
     #
     sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
+    #
+    sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
 
 }
 ################################################################################
@@ -112,7 +115,7 @@ echo "Installation completed"
 echo "---------------------------------------------------------------------------"
 echo "Installation is complete, please read below information"
 echo "To access MediaWiki, please use admin/xlp-admin-pass"
-echo "To access Gitea, please register user, first user to register is the admin"
+echo "To access Gitea, please use admin/pkc-admin"
 echo "To access Matomo, please use user/bitnami"
 echo "To access phpMyAdmin, please use Database: database, User: root, password: secret"
 echo "To access Code Server, please use password: $VS_PASSWORD"
