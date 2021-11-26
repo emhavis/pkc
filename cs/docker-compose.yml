@@ -77,6 +77,7 @@ services:
     image: emhavis/pkc_semanticwiki:v0.2
     container_name: xlp_mediawiki
     # platform: linux/amd64
+    #
     restart: always
     ports:    
     - ${PORT_NUMBER}:80
