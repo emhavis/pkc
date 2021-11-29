@@ -95,6 +95,7 @@
     loop:
       - {src: './script/cs-backup.sh', dest: './cs/cs-backup.sh'}
       - {src: './script/cs-restore.sh', dest: './cs/cs-restore.sh'}
+      - {src: './script/cs-offsite-restore.sh', dest: './cs/cs-offsite-restore.sh'}
       - {src: './script/update-sw.sh', dest: './cs/update-sw.sh'}
       - {src: './script/mtm-sql.sh', dest: './cs/mtm-sql.sh'}
     become: true
@@ -161,8 +162,9 @@
 
   - name: Execute the update script 
     command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"
-
+#
 # Docker Post Installation, enable docker without sudo
+#
   - name: Create group
     group:
       name: "docker"

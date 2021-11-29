@@ -1,0 +1,39 @@
+# ansible-playbook 
+---
+- name: install ansible agent on target machine and necessary script to perform off-site backup
+  hosts: all
+  become: yes
+  vars_files:
+    - ./config/default.yml
+
+  tasks:
+  - name: Update apt-get
+    apt:
+      update_cache: yes
+      cache_valid_time: 3600
+
+  - name: Install software-properties-common
+    apt:
+      name: software-properties-common
+      state: present
+
+  - name: Add ansible/ansible
+    ansible.builtin.apt_repository:
+      repo: ppa:ansible/ansible
+
+  - name: Install Ansible
+    apt:
+      name: ansible
+      state: present
+
+  - name: Copy Off-Site backup file
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: false
+    loop:
+      - {src: './cs-remote-host', dest: './cs/'}
+      - {src: '~/.ssh/OregonCluster.pem', dest: '/home/ubuntu/.ssh/'}
+      - {src: './script/cs-offsite-restore.sh', dest: './cs/'}
+      - {src: './cs-offsite-restore.yml', dest: './cs/'}
+    become: true

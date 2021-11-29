@@ -24,7 +24,7 @@
   - name: ansible copy file from remote to local.
     fetch:
       src: "{{ latest_file.path }}"
-      dest: "./downloaded/{{ ansible_host }}"
+      dest: "./downloaded/{{ ansible_host }}-mariadb.tar.gz"
       flat: yes
 #
 # download images file
@@ -41,7 +41,7 @@
   - name: ansible copy file from remote to local.
     fetch:
       src: "{{ latest_file.path }}"
-      dest: "./downloaded/{{ ansible_host }}"
+      dest: "./downloaded/{{ ansible_host }}-mediawiki.tar.gz"
       flat: yes
 
 

@@ -29,7 +29,7 @@ $wgSitename = "PKC Media Wiki";
 $wgScriptPath = "";
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = "https://www.pkc-dev.org";
+$wgServer = "https://www.pkc-back.org";
 
 ## The URL path to static resources (images, scripts, etc.)
 $wgResourceBasePath = $wgScriptPath;
@@ -259,7 +259,7 @@ function onBeforePageDisplay( OutputPage &$out, Skin &$skin )
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u='//mtm.pkc-dev.org/';
+    var u='//mtm.pkc-back.org/';
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '1']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
@@ -297,7 +297,7 @@ $wgEnableUploads = true;
 // $wgOAuth2Client['configuration']['authorize_endpoint']     = 'https://github.com/login/oauth/authorize'; // Authorization URL
 // $wgOAuth2Client['configuration']['access_token_endpoint']  = 'https://github.com/login/oauth/access_token'; // Token URL
 // $wgOAuth2Client['configuration']['api_endpoint']           = 'https://api.github.com/user'; // URL to fetch user JSON
-// $wgOAuth2Client['configuration']['redirect_uri'] = "https://www.pkc-dev.org/index.php/Special:OAuth2Client/callback";
+// $wgOAuth2Client['configuration']['redirect_uri'] = "https://www.pkc-back.org/index.php/Special:OAuth2Client/callback";
 // $wgOAuth2Client['configuration']['username'] = 'login'; // JSON path to username
 // $wgOAuth2Client['configuration']['email'] = 'email'; // JSON path to email
 // $wgOAuth2Client['configuration']['scopes'] = 'openid email profile'; //Permissions
