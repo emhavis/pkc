@@ -29,7 +29,7 @@ $wgSitename = "PKC Media Wiki";
 $wgScriptPath = "";
 
 ## The protocol and server name to use in fully-qualified URLs
-$wgServer = "https://www.pkc-back.org";
+$wgServer = "http://localhost:32001";
 
 ## The URL path to static resources (images, scripts, etc.)
 $wgResourceBasePath = $wgScriptPath;
@@ -259,7 +259,7 @@ function onBeforePageDisplay( OutputPage &$out, Skin &$skin )
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u='//mtm.pkc-back.org/';
+    var u='//localhost:32010/';
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '1']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
@@ -297,7 +297,7 @@ $wgEnableUploads = true;
 // $wgOAuth2Client['configuration']['authorize_endpoint']     = 'https://github.com/login/oauth/authorize'; // Authorization URL
 // $wgOAuth2Client['configuration']['access_token_endpoint']  = 'https://github.com/login/oauth/access_token'; // Token URL
 // $wgOAuth2Client['configuration']['api_endpoint']           = 'https://api.github.com/user'; // URL to fetch user JSON
-// $wgOAuth2Client['configuration']['redirect_uri'] = "https://www.pkc-back.org/index.php/Special:OAuth2Client/callback";
+// $wgOAuth2Client['configuration']['redirect_uri'] = "http://localhost:32001/index.php/Special:OAuth2Client/callback";
 // $wgOAuth2Client['configuration']['username'] = 'login'; // JSON path to username
 // $wgOAuth2Client['configuration']['email'] = 'email'; // JSON path to email
 // $wgOAuth2Client['configuration']['scopes'] = 'openid email profile'; //Permissions
@@ -318,7 +318,7 @@ $wgEnableUploads = true;
 wfLoadExtension( 'OpenIDConnect' );
 wfLoadExtension( 'PluggableAuth' );
 // // https://kck.anindhaloka.org/auth/realms/pkc-realm/.well-known/openid-configuration --> check here
-$wgOpenIDConnect_Config['#KCK_SUBDOMAIN/auth/realms/pkc-realm/'] = [
+$wgOpenIDConnect_Config['http://localhost:32060/auth/realms/pkc-realm/'] = [
   'clientID' => 'pkc-client',
   'clientsecret' => 'd9ecdca8-ad69-4322-9452-ff725898eb03',
   'scope' => [ 'openid', 'profile', 'email' ]
