@@ -37,7 +37,7 @@ function prep_mw {
     #
     sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/config.ini.php > ./config/config.ini.php
     #
-    sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
+    sed "s|#YOUR_KCK_FQDN|$KCK_AUTH_FQDN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
     #
     sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
 }
@@ -52,6 +52,8 @@ function prep_local {
     cp ./config/config.ini.php-local ./mountpoint/matomo/config/config.ini.php
     # config/app.ini
     cp ./config/app.ini ./mountpoint/gitea/gitea/conf/app.ini
+    cp ./config/update-mtm-config.sql ./mountpoint/backup_restore/mariadb/update-mtm-config.sql
+    ./script/mtm-sql.sh
 }
 ################################################################################
 ## Main
@@ -138,10 +140,10 @@ echo ""
 #
 # Bring up the system
 # docker-compose up -d
-docker-compose -f cs/docker-compose.yml up -d
+docker-compose up -d
 #
-read -t 5 -p "Wait 5 second until mySQL is Ready ..."
-docker exec -it xlp_mediawiki php ./maintenance/update.php --quick
+read -t 15 -p "Wait 15 second until mySQL is Ready ..."
+docker exec -it xlp_mediawiki php /var/www/html/maintenance/update.php --quick
 #
 echo "Installation completed"
 # display login information
