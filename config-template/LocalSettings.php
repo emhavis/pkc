@@ -317,7 +317,7 @@ $wgEnableUploads = true;
 // Keycloak Configuration
 wfLoadExtension( 'OpenIDConnect' );
 wfLoadExtension( 'PluggableAuth' );
-// // https://kck.anindhaloka.org/auth/realms/pkc-realm/.well-known/openid-configuration --> check here
+// // http://localhost:32060/auth/realms/pkc-realm/.well-known/openid-configuration --> check here
 $wgOpenIDConnect_Config['#KCK_SUBDOMAIN/auth/realms/pkc-realm/'] = [
   'clientID' => 'pkc-client',
   'clientsecret' => 'd9ecdca8-ad69-4322-9452-ff725898eb03',

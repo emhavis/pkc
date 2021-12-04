@@ -31,7 +31,7 @@ function prep_mw {
         FQDN="$DEFAULT_TRANSPORT://www.$YOUR_DOMAIN"
     fi
     #
-    sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
+    sed "s|#MTM_FQDN|$MTM_FQDN|g" ./config-template/LocalSettings-Local.php > ./config/LocalSettings.php
     sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
     sed -i '' "s|#KCK_SUBDOMAIN|$KCK_AUTH_FQDN|g" ./config/LocalSettings.php
     #
@@ -53,7 +53,6 @@ function prep_local {
     # config/app.ini
     cp ./config/app.ini ./mountpoint/gitea/gitea/conf/app.ini
     cp ./config/update-mtm-config.sql ./mountpoint/backup_restore/mariadb/update-mtm-config.sql
-    ./script/mtm-sql.sh
 }
 ################################################################################
 ## Main
@@ -110,7 +109,7 @@ docker info | grep -q docker-desktop && echo "Docker is found, not installing...
 # read -p "Prep nginx Press [Enter] key to continue..."
 # prep_nginx
 # 2. LocalSettings.php files
-echo "Prep mw Press [Enter] key to continue..."
+read -p "Prep Mediawiki configuration Press [Enter] key to continue..."
 echo ""
 echo ""
 prep_mw
@@ -118,6 +117,7 @@ prep_mw
 # is this localhost implementation?
 echo "$YOUR_DOMAIN"
 if [ "$YOUR_DOMAIN" == "localhost" ]; then
+    read -p "Preparing Mediawiki for Local Installation, Press [Enter] key to continue..."
     # copy files to cs folder
     prep_local
 fi
@@ -142,15 +142,16 @@ echo ""
 # docker-compose up -d
 docker-compose up -d
 #
-read -t 15 -p "Wait 15 second until mySQL is Ready ..."
-docker exec -it xlp_mediawiki php /var/www/html/maintenance/update.php --quick
+read -t 5 -p "Wait 30 second for mySQL Service Ready"
+docker exec xlp_mediawiki php /var/www/html/maintenance/update.php --quick
+./script/mtm-sql.sh
 #
 echo "Installation completed"
 # display login information
 echo "---------------------------------------------------------------------------"
 echo "Installation is complete, please read below information"
 echo "To access MediaWiki [localhost:$PORT_NUMBER], please use admin/xlp-admin-pass"
-echo "To access Gitea [localhost:32030], please register user, first user to register is the admin"
+echo "To access Gitea [localhost:$GITEA_PORT_NUMBER], To access Gitea, please use admin/pkc-admin"
 echo "To access Matomo [localhost:$MATOMO_PORT_NUMBER], please use user/bitnami"
 echo "To access phpMyAdmin [localhost:$PHP_MA], please use Database: database, User: root, password: secret"
 echo "To access Code Server [localhost:$VS_PORT_NUMBER], please use password: $VS_PASSWORD"
