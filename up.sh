@@ -1,16 +1,198 @@
-# try to remove all available docker image, start zero
-docker rmi $(docker images -a -q)
-# Loading all images
-docker load -i ./docker-image/xlp_codeserver.tar.gz
-docker load -i ./docker-image/xlp_gitea.tar.gz
-docker load -i ./docker-image/xlp_mariadb.tar.gz
-docker load -i ./docker-image/xlp_matomo.tar.gz
-docker load -i ./docker-image/xlp_mediawiki.tar.gz
-docker load -i ./docker-image/xlp_phpmyadmin.tar.gz
-#
-#
-# Bring up the system
-docker-compose up -d
-#
-# update database
-docker exec -it xlp_mediawiki php ./maintenance/update.php --quick
+#!/bin/bash
+# # try to remove all available docker image, start zero
+# docker rmi $(docker images -a -q)
+# # Loading all images
+# docker load -i ./docker-image/xlp_codeserver.tar.gz
+# docker load -i ./docker-image/xlp_gitea.tar.gz
+# docker load -i ./docker-image/xlp_mariadb.tar.gz
+# docker load -i ./docker-image/xlp_matomo.tar.gz
+# docker load -i ./docker-image/xlp_mediawiki.tar.gz
+# docker load -i ./docker-image/xlp_phpmyadmin.tar.gz
+# #
+# #
+# # Bring up the system
+# docker-compose up -d
+# #
+# # update database
+# docker exec -it xlp_mediawiki php ./maintenance/update.php --quick
+
+#####################################################################
+function prep_nginx {
+    # sed -i 's/old-text/new-text/g' input.txt
+    echo "Preparing NGINX Config Files ..."
+    # 
+    sed "s/#GIT_SUBDOMAIN/$GITEA_SUBDOMAIN/g" ./config-template/git.conf > ./config/git.conf
+    sed "s/#PMA_SUBDOMAIN/$PMA_SUBDOMAIN/g" ./config-template/pma.conf > ./config/pma.conf
+    sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/mtm.conf > ./config/mtm.conf
+    sed "s/#VS_SUBDOMAIN/$VS_SUBDOMAIN/g" ./config-template/vs.conf > ./config/vs.conf
+    sed "s/#YOUR_DOMAIN/$YOUR_DOMAIN/g" ./config-template/reverse-proxy.conf > ./config/reverse-proxy.conf
+    sed "s/#YOUR_DOMAIN/$YOUR_DOMAIN/g" ./config-template/pkc.conf > ./config/pkc.conf
+    echo ""
+}
+
+#####################################################################
+function prep_local {
+    # 
+    # extracting mountpoint
+    tar -xvf mountpoint.tar.gz
+    # copy LocalSettings.php
+    echo "Applying Localhost setting .... "
+    cp ./config/LocalSettings.php ./mountpoint/LocalSettings.php
+    cp ./config/config.ini.php-local ./mountpoint/matomo/config/config.ini.php
+    # config/app.ini
+    cp ./config/app.ini ./mountpoint/gitea/gitea/conf/app.ini
+    cp ./config/update-mtm-config.sql ./mountpoint/backup_restore/mariadb/update-mtm-config.sql
+    # prepare docker-compose
+    cp ./config-template/docker-compose-local.yml docker-compose.yml
+}
+
+function prep_mw_localhost {
+    echo "Prepare LocalSettings.php file"
+    FQDN="$DEFAULT_TRANSPORT://$YOUR_DOMAIN:$PORT_NUMBER"
+    KCK_AUTH_FQDN="$DEFAULT_TRANSPORT://$YOUR_DOMAIN:$KCK_PORT_NUMBER"
+    MTM_FQDN="$DEFAULT_TRANSPORT://$YOUR_DOMAIN:$MATOMO_PORT_NUMBER"
+    GIT_FQDN="$DEFAULT_TRANSPORT://$YOUR_DOMAIN:$GITEA_PORT_NUMBER"
+    #
+    sed "s|#MTM_FQDN|$MTM_FQDN|g" ./config-template/LocalSettings-Local.php > ./config/LocalSettings.php
+    sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
+    sed -i '' "s|#KCK_SUBDOMAIN|$KCK_AUTH_FQDN|g" ./config/LocalSettings.php
+    #
+    sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/config.ini.php > ./config/config.ini.php
+    #
+    sed "s|#YOUR_KCK_FQDN|$KCK_AUTH_FQDN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
+    #
+    sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
+}
+
+function prep_mw_domain {
+    echo "Prepare LocalSettings.php file"
+    FQDN="$DEFAULT_TRANSPORT://www.$YOUR_DOMAIN"
+    KCK_AUTH_FQDN="$DEFAULT_TRANSPORT://kck.$YOUR_DOMAIN"
+    MTM_FQDN="$DEFAULT_TRANSPORT://mtm.$YOUR_DOMAIN"
+    GIT_FQDN="$DEFAULT_TRANSPORT://git.$YOUR_DOMAIN"
+    #
+    sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
+    sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
+    sed -i '' "s|#KCK_SUBDOMAIN|$KCK_AUTH_FQDN|g" ./config/LocalSettings.php
+    #
+    sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/config.ini.php > ./config/config.ini.php
+    #
+    sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
+    #
+    sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
+}
+
+#####################################################################
+# Read .env, and present our plan to user
+if [ -f .env ]; then
+    export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+    if [ "$YOUR_DOMAIN" == "localhost" ]; then {
+        GITEA_SUBDOMAIN=$YOUR_DOMAIN:$GITEA_PORT_NUMBER
+        PMA_SUBDOMAIN=$YOUR_DOMAIN:$PHP_MA
+        MTM_SUBDOMAIN=$YOUR_DOMAIN:$MATOMO_PORT_NUMBER
+        VS_SUBDOMAIN=$YOUR_DOMAIN:$VS_PORT_NUMBER
+        KCK_SUBDOMAIN=$YOUR_DOMAIN:$KCK_PORT_NUMBER
+
+        # Displays localhost installation plan
+        echo "--------------------------------------------------------"
+        echo "Installation Plan:"
+        echo ""
+        echo "Loaded environmental variable: "
+        echo "Port number for Mediawiki: $PORT_NUMBER"
+        echo "Port number for Matomo Service: $MATOMO_PORT_NUMBER"
+        echo ""
+        echo ""
+        echo "If you have installed Dockers, please ensure your"
+        echo "Docker desktop is running."
+        echo ""
+        read -p "Press [Enter] key to continue..."
+        echo "---------------------------------------   -----------------"
+
+        prep_mw_localhost
+        prep_local
+
+        # Pre-Requisite, install docker
+        docker info | grep -q docker-desktop && echo "Docker is found, not installing..." || brew install --cask docker
+        # bring all the service up
+        docker-compose up -d
+        # wait mysql service is ready
+        read -t 10 -p "Wait 10 second for mySQL Service Ready"
+        # run maintenance script
+        docker exec xlp_mediawiki php /var/www/html/maintenance/update.php --quick
+        # run matomo config script
+        ./script/mtm-sql.sh
+
+        # display login information
+        echo "---------------------------------------------------------------------------"
+        echo "Installation is complete, please read below information"
+        echo "To access MediaWiki [localhost:$PORT_NUMBER], please use admin/xlp-admin-pass"
+        echo "To access Matomo [localhost:$MATOMO_PORT_NUMBER], please use user/bitnami"
+        echo ""
+        echo "---------------------------------------------------------------------------"
+
+    } else {
+        GITEA_SUBDOMAIN=git.$YOUR_DOMAIN
+        PMA_SUBDOMAIN=pma.$YOUR_DOMAIN
+        MTM_SUBDOMAIN=mtm.$YOUR_DOMAIN
+        VS_SUBDOMAIN=code.$YOUR_DOMAIN
+        KCK_SUBDOMAIN=$YOUR_DOMAIN:$KCK_PORT_NUMBER
+
+        # Displays installation plan on remote host machine
+        echo "--------------------------------------------------------"
+        echo "Installation Plan:"
+        echo "Ansible script to install on host file: $1"
+        echo ""
+        echo "Loaded environmental variable: "
+        echo "Port number for Mediawiki: $PORT_NUMBER"
+        echo "Port number for Matomo Service: $MATOMO_PORT_NUMBER"
+        echo "Port number for PHPMyAdmin: $PHP_MA"
+        echo "Port number for Gitea Service: $GITEA_PORT_NUMBER"
+        echo "Port number for Code Server: $VS_PORT_NUMBER"
+        echo "Port number for Keycloak: $KCK_PORT_NUMBER"
+        echo ""
+        echo "Your domain name is: $YOUR_DOMAIN"
+        echo "default installation will configure below subdomain: "
+        echo "PHPMyAdmin will be accessible from: $PMA_SUBDOMAIN"
+        echo "Gitea will be accessible from: $GITEA_SUBDOMAIN"
+        echo "Matomo will be accessible from: $MTM_SUBDOMAIN"
+        echo "Code Server will be accessible from: $VS_SUBDOMAIN"
+        echo "Keycloak will be accessible from: $KCK_SUBDOMAIN"
+        echo ""
+        echo ""
+        read -p "Press [Enter] key to continue..."
+        echo "--------------------------------------------------------"
+
+        prep_nginx
+        prep_mw_domain
+        ansible-playbook -i $1 cs-clean.yml
+        ansible-playbook -i $1 cs-up.yml
+        #
+        # Install HTTPS SSL
+        if [ $DEFAULT_TRANSPORT == "https" ]; then
+            echo "Installing SSL Certbot for $DEFAULT_TRANSPORT protocol"
+            ./cs-certbot.sh $1
+        fi
+        #
+        echo "Check installation status"
+        ansible-playbook -i $1 cs-svc.yml  
+      
+        echo "---------------------------------------------------------------------------"
+        echo "Installation is complete, please read below information"
+        echo "To access MediaWiki, please use admin/xlp-admin-pass"
+        echo "To access Gitea, please use admin/pkc-admin"
+        echo "To access Matomo, please use user/bitnami"
+        echo "To access phpMyAdmin, please use Database: database, User: root, password: secret"
+        echo "To access Code Server, please use password: $VS_PASSWORD"
+        echo "To access Keycloak, please use admin/Pa55w0rd"
+        echo ""
+        echo "---------------------------------------------------------------------------"
+
+        # display finish time
+        date
+
+    }
+    fi
+else
+    echo ".env files not found, please provide the .env file"
+    exit 1;
+fi

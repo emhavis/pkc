@@ -37,7 +37,6 @@ function prep_mw {
     sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
     #
     sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
-
 }
 ################################################################################
 ## Main

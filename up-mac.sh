@@ -82,10 +82,6 @@ if [ -f .env ]; then
     echo "Loaded environmental variable: "
     echo "Port number for Mediawiki: $PORT_NUMBER"
     echo "Port number for Matomo Service: $MATOMO_PORT_NUMBER"
-    echo "Port number for PHPMyAdmin: $PHP_MA"
-    echo "Port number for Gitea Service: $GITEA_PORT_NUMBER"
-    echo "Port number for Code Server: $VS_PORT_NUMBER"
-    echo "Port number for Keycloak Server: $KCK_PORT_NUMBER"
     echo ""
     echo ""
     echo "If you have installed Dockers, please ensure your"
@@ -140,6 +136,7 @@ echo ""
 #
 # Bring up the system
 # docker-compose up -d
+cp ./config-template/docker-compose-local.yml docker-compose.yml
 docker-compose up -d
 #
 read -t 5 -p "Wait 30 second for mySQL Service Ready"
@@ -151,11 +148,7 @@ echo "Installation completed"
 echo "---------------------------------------------------------------------------"
 echo "Installation is complete, please read below information"
 echo "To access MediaWiki [localhost:$PORT_NUMBER], please use admin/xlp-admin-pass"
-echo "To access Gitea [localhost:$GITEA_PORT_NUMBER], To access Gitea, please use admin/pkc-admin"
 echo "To access Matomo [localhost:$MATOMO_PORT_NUMBER], please use user/bitnami"
-echo "To access phpMyAdmin [localhost:$PHP_MA], please use Database: database, User: root, password: secret"
-echo "To access Code Server [localhost:$VS_PORT_NUMBER], please use password: $VS_PASSWORD"
-echo "To access Keycloak Server [localhost:$KCK_PORT_NUMBER], please use admin/Pa55w0rd"
 echo ""
 echo "---------------------------------------------------------------------------"
 
