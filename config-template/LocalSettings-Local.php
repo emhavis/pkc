@@ -325,3 +325,17 @@ $wgEnableUploads = true;
 // ];
 // #
 // $wgGroupPermissions['*']['autocreateaccount'] = true;
+
+// Semantic Result Format
+wfLoadExtension( 'SemanticResultFormats' );
+
+$srfgFormats = [
+  'icalendar', 
+  'vcard', 'bibtex', 'calendar', 
+  'eventcalendar', 'eventline', 'timeline', 
+  'outline', 'gallery', 'jqplotchart', 'jqplotseries', 
+  'sum', 'average', 'min', 'max', 'median', 'product', 
+  'tagcloud', 'valuerank', 'array', 
+  'tree', 'ultree', 'oltree', 'd3chart', 'latest', 'earliest', 'filtered', 'slideshow', 'timeseries', 'sparkline', 
+  'listwidget', 'pagewidget', 'dygraphs', 'media', 'datatables'
+];

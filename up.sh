@@ -34,16 +34,21 @@ function prep_nginx {
 function prep_local {
     # 
     # extracting mountpoint
-    tar -xvf mountpoint.tar.gz
+    # Make sure that the docker-compose.yml is available in this directory, otherwise, download it.
+    if [ ! -e ./mountpoint ]; then
+        tar -xvf mountpoint.tar.gz
+    fi
     # copy LocalSettings.php
     echo "Applying Localhost setting .... "
     cp ./config/LocalSettings.php ./mountpoint/LocalSettings.php
     cp ./config/config.ini.php-local ./mountpoint/matomo/config/config.ini.php
+    cp ./config-template/LocalSettings-local.php ./mountpoint/LocalSettings.php
     # config/app.ini
     cp ./config/app.ini ./mountpoint/gitea/gitea/conf/app.ini
     cp ./config/update-mtm-config.sql ./mountpoint/backup_restore/mariadb/update-mtm-config.sql
-    # prepare docker-compose
+    # docker composre file, consist of minimal installation
     cp ./config-template/docker-compose-local.yml docker-compose.yml
+
 }
 
 function prep_mw_localhost {
@@ -106,7 +111,7 @@ if [ -f .env ]; then
         echo "Docker desktop is running."
         echo ""
         read -p "Press [Enter] key to continue..."
-        echo "---------------------------------------   -----------------"
+        echo "--------------------------------------------------------"
 
         prep_mw_localhost
         prep_local
