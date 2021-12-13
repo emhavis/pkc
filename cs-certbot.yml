@@ -1,4 +1,4 @@
-- name: install and provisioning dockers Cleanslate Servers
+- name: Install PKC HTTPS 
   hosts: all
   become: yes
   vars_files:

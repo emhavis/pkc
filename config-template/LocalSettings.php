@@ -259,7 +259,7 @@ function onBeforePageDisplay( OutputPage &$out, Skin &$skin )
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
-    var u='//#MTM_SUBDOMAIN/';
+    var u='#MTM_SUBDOMAIN';
     _paq.push(['setTrackerUrl', u+'matomo.php']);
     _paq.push(['setSiteId', '1']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];

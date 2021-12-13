@@ -25,6 +25,7 @@ function prep_nginx {
     sed "s/#PMA_SUBDOMAIN/$PMA_SUBDOMAIN/g" ./config-template/pma.conf > ./config/pma.conf
     sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/mtm.conf > ./config/mtm.conf
     sed "s/#VS_SUBDOMAIN/$VS_SUBDOMAIN/g" ./config-template/vs.conf > ./config/vs.conf
+    sed "s/#KCK_SUBDOMAIN/$KCK_SUBDOMAIN/g" ./config-template/kck.conf > ./config/kck.conf
     sed "s/#YOUR_DOMAIN/$YOUR_DOMAIN/g" ./config-template/reverse-proxy.conf > ./config/reverse-proxy.conf
     sed "s/#YOUR_DOMAIN/$YOUR_DOMAIN/g" ./config-template/pkc.conf > ./config/pkc.conf
     echo ""
@@ -36,7 +37,7 @@ function prep_local {
     # extracting mountpoint
     # Make sure that the docker-compose.yml is available in this directory, otherwise, download it.
     if [ ! -e ./mountpoint ]; then
-        tar -xvf mountpoint.tar.gz
+        tar -xvf mountpoint-mac.tar.gz
     fi
     # copy LocalSettings.php
     echo "Applying Localhost setting .... "
@@ -76,19 +77,22 @@ function prep_mw_domain {
     MTM_FQDN="$DEFAULT_TRANSPORT://mtm.$YOUR_DOMAIN"
     GIT_FQDN="$DEFAULT_TRANSPORT://git.$YOUR_DOMAIN"
     #
-    sed "s/#MTM_SUBDOMAIN/$MTM_SUBDOMAIN/g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
+    sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/LocalSettings.php > ./config/LocalSettings.php
     sed -i '' "s|#YOUR_FQDN|$FQDN|g" ./config/LocalSettings.php
     sed -i '' "s|#KCK_SUBDOMAIN|$KCK_AUTH_FQDN|g" ./config/LocalSettings.php
     #
     sed "s|#MTM_SUBDOMAIN|$MTM_FQDN|g" ./config-template/config.ini.php > ./config/config.ini.php
     #
     sed "s|#YOUR_DOMAIN|$YOUR_DOMAIN|g" ./config-template/update-mtm-config.sql > ./config/update-mtm-config.sql
+    sed -i '' "s|#YOUR_KCK_FQDN_DOMAIN|$KCK_AUTH_FQDN|g" ./config/update-mtm-config.sql
     #
     sed "s|#GIT_FQDN|$GIT_FQDN|g" ./config-template/app.ini > ./config/app.ini
 }
 
 #####################################################################
 # Read .env, and present our plan to user
+echo "Mark Started Process at $(date)"
+
 if [ -f .env ]; then
     export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
     if [ "$YOUR_DOMAIN" == "localhost" ]; then {
@@ -140,7 +144,7 @@ if [ -f .env ]; then
         PMA_SUBDOMAIN=pma.$YOUR_DOMAIN
         MTM_SUBDOMAIN=mtm.$YOUR_DOMAIN
         VS_SUBDOMAIN=code.$YOUR_DOMAIN
-        KCK_SUBDOMAIN=$YOUR_DOMAIN:$KCK_PORT_NUMBER
+        KCK_SUBDOMAIN=kck.$YOUR_DOMAIN
 
         # Displays installation plan on remote host machine
         echo "--------------------------------------------------------"
@@ -169,17 +173,18 @@ if [ -f .env ]; then
 
         prep_nginx
         prep_mw_domain
-        ansible-playbook -i $1 cs-clean.yml
-        ansible-playbook -i $1 cs-up.yml
+        # read -p "check config files"
+        ansible-playbook -i hosts cs-clean.yml
+        ansible-playbook -i hosts cs-up.yml
         #
         # Install HTTPS SSL
         if [ $DEFAULT_TRANSPORT == "https" ]; then
             echo "Installing SSL Certbot for $DEFAULT_TRANSPORT protocol"
-            ./cs-certbot.sh $1
+            ./cs-certbot.sh hosts
         fi
         #
         echo "Check installation status"
-        ansible-playbook -i $1 cs-svc.yml  
+        ansible-playbook -i hosts cs-svc.yml  
       
         echo "---------------------------------------------------------------------------"
         echo "Installation is complete, please read below information"
@@ -194,10 +199,11 @@ if [ -f .env ]; then
 
         # display finish time
         date
-
     }
     fi
 else
     echo ".env files not found, please provide the .env file"
     exit 1;
 fi
+
+echo "Mark Finished Process at $(date)"

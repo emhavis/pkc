@@ -1,6 +1,6 @@
 # ansible-playbook -i hosts cs-svc.yml
 ---
-- name: up and running docker containers
+- name: Check all docker service
   hosts: all
   become: yes
   gather_facts: yes

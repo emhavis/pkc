@@ -1,5 +1,5 @@
 ---
-- name: install and provisioning dockers Cleanslate Servers
+- name: install and provisioning dockers PKC Server
   hosts: all
   become: yes
 
@@ -60,19 +60,19 @@
         - docker
         - docker-compose
 
-  - name: create clean-slate docker-compose directory
+  - name: create PKC docker-compose directory
     file:
       path: ./cs
       state: directory
 
-  - name: create clean-slate mysql init folder
+  - name: create PKC mysql init folder
     file:
       path: ./cs/mysql-init
       state: directory
 
   - name: Upload docker-compose
     ansible.builtin.copy:
-      src: ./cs/docker-compose.yml
+      src: ./config-template/docker-compose.yml
       dest: ./cs
 
   - name: Upload /cs/.env to remote
@@ -100,6 +100,7 @@
       - {src: './script/mtm-sql.sh', dest: './cs/mtm-sql.sh'}
     become: true
 
+  # split into two 
   - name: Extract mountpoint.tar.gz
     ansible.builtin.unarchive:
       src: ./mountpoint.tar.gz
@@ -138,6 +139,13 @@
       comment: matomo docker account
       uid: 33
       state: present
+
+  - name: Change Matomo Ownership Folder
+    ansible.builtin.file:
+      path: ./cs/mountpoint/matomo
+      state: directory
+      recurse: yes
+      owner: mtm
 #
 # Docker Compose Statement
 # 
