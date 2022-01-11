@@ -75,11 +75,6 @@
       src: ./config-template/docker-compose.yml
       dest: ./cs
 
-  - name: Upload /cs/.env to remote
-    ansible.builtin.copy:
-      src: .env
-      dest: ./cs/.env
-
   - name: Upload initdb script
     ansible.builtin.copy:
       src: ./cs/mysql-init/init.sql
@@ -98,6 +93,7 @@
       - {src: './script/cs-offsite-restore.sh', dest: './cs/cs-offsite-restore.sh'}
       - {src: './script/update-sw.sh', dest: './cs/update-sw.sh'}
       - {src: './script/mtm-sql.sh', dest: './cs/mtm-sql.sh'}
+      - {src: './.env', dest: './cs/.env'}
     become: true
 
   # split into two 
@@ -155,7 +151,7 @@
       dest: /usr/local/bin/docker-compose
       mode: 755
 
-  - name: Down existing PKC Service
+  - name: Shut Dwn existing PKC Service
     community.docker.docker_compose:
       project_src: cs
       state: absent
@@ -180,5 +176,5 @@
 
   - name: Adding user ubuntu
     user: name=ubuntu
-          group=docker
+          groups=docker
           append=yes
