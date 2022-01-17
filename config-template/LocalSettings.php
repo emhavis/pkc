@@ -326,7 +326,6 @@ $wgOpenIDConnect_Config['#KCK_SUBDOMAIN/auth/realms/pkc-realm/'] = [
 #
 $wgGroupPermissions['*']['autocreateaccount'] = true;
 
-
 // Semantic Result Format
 wfLoadExtension( 'SemanticResultFormats' );
 
@@ -340,3 +339,11 @@ $srfgFormats = [
   'tree', 'ultree', 'oltree', 'd3chart', 'latest', 'earliest', 'filtered', 'slideshow', 'timeseries', 'sparkline', 
   'listwidget', 'pagewidget', 'dygraphs', 'media', 'datatables'
 ];
+#
+$wgAllowCiteGroups = true; 
+$wgCiteBookReferencing = true;
+
+# debug enable below this
+$wgShowExceptionDetails = true;
+$wgDebugToolbar = true;
+$wgDevelopmentWarnings = true;

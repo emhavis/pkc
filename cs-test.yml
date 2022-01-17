@@ -1,15 +1,8 @@
 ---
-- name: install and provisioning dockers Cleanslate Servers
+- name: execute update maintenance script on remote mirror
   hosts: all
   become: yes
 
   tasks:
-  - name: Create group
-    group:
-      name: "docker"
-      state: present
-
-  - name: Adding user ubuntu
-    user: name=ubuntu
-          groups=docker
-          append=yes
+  - name: Execute the update script 
+    command: sh -c "{{ ansible_env.PWD }}/cs/update-sw.sh"
