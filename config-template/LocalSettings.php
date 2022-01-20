@@ -343,7 +343,11 @@ $srfgFormats = [
 $wgAllowCiteGroups = true; 
 $wgCiteBookReferencing = true;
 
-
+# Matomo for mediawiki configuration
+wfLoadExtension( 'MatomoAnalytics' );
+$wgMatomoAnalyticsServerURL = 'https://mtm.pkc.pub/';
+$wgMatomoAnalyticsTokenAuth = '7524544b78e7242433ab5a72fcd3101d';
+$wgMatomoAnalyticsSiteID = 1;
 
 // # debug enable below this
 // $wgShowExceptionDetails = true;
