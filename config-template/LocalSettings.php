@@ -343,7 +343,9 @@ $srfgFormats = [
 $wgAllowCiteGroups = true; 
 $wgCiteBookReferencing = true;
 
-# debug enable below this
-$wgShowExceptionDetails = true;
-$wgDebugToolbar = true;
-$wgDevelopmentWarnings = true;
+
+
+// # debug enable below this
+// $wgShowExceptionDetails = true;
+// $wgDebugToolbar = true;
+// $wgDevelopmentWarnings = true;
