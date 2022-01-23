@@ -287,7 +287,12 @@ $wgFileExtensions = array_merge(
   );
 
 enableSemantics();
+
+// add semantic scribunto
+wfLoadExtension( 'SemanticScribunto' );
 $wgEnableUploads = true;
+
+
 
 // wfLoadExtension( 'MW-OAuth2Client' );
 # The following two lines contains information on Github's OAuth service. You will have to apply for your own information to get things to work.
