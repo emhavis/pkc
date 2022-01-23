@@ -134,8 +134,8 @@ BACKUP_PREFIX_IMG="${BACKUP_DIR}/mediawiki/${PREFIX}"
 
 if [[ "$BASH_SOURCE" == "$0" ]];then
     # database restore process
-    restore_db
     restore_img
+    restore_db
     update_mw
 
     echo 'Restarting Docker Service'

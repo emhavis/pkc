@@ -305,14 +305,14 @@ $wgEnableUploads = true;
 // $wgOAuth2Client['configuration']['service_login_link_text'] = 'Login through Github'; // the text of the login link
 
 // remove login and logout buttons for all users
-// function StripLogin(&$personal_urls, &$wgTitle) {
-//     unset( $personal_urls["login"] );
-//     # unset( $personal_urls["logout"] );
-//     unset( $personal_urls['anonlogin'] );
-//     return true;
-// }
+function StripLogin(&$personal_urls, &$wgTitle) {
+    unset( $personal_urls["login"] );
+    # unset( $personal_urls["logout"] );
+    unset( $personal_urls['anonlogin'] );
+    return true;
+}
 
-// $wgHooks['PersonalUrls'][] = 'StripLogin';
+$wgHooks['PersonalUrls'][] = 'StripLogin';
 
 // Keycloak Configuration
 wfLoadExtension( 'OpenIDConnect' );
@@ -345,9 +345,29 @@ $wgCiteBookReferencing = true;
 
 # Matomo for mediawiki configuration
 wfLoadExtension( 'MatomoAnalytics' );
-$wgMatomoAnalyticsServerURL = 'https://mtm.pkc.pub/';
+$wgMatomoAnalyticsServerURL = '#MTM_SUBDOMAIN/';
 $wgMatomoAnalyticsTokenAuth = '7524544b78e7242433ab5a72fcd3101d';
 $wgMatomoAnalyticsSiteID = 1;
+
+# Multilingual Pack Configurations
+wfLoadExtension( 'Babel' );
+wfLoadExtension( 'cldr' );
+wfLoadExtension( 'CleanChanges' );
+$wgCCTrailerFilter = true;
+$wgCCUserFilter = false;
+$wgDefaultUserOptions['usenewrc'] = 1;
+wfLoadExtension( 'LocalisationUpdate' );
+$wgLocalisationUpdateDirectory = "$IP/cache";
+wfLoadExtension( 'Translate' );
+$wgGroupPermissions['user']['translate'] = true;
+$wgGroupPermissions['user']['translate-messagereview'] = true;
+$wgGroupPermissions['user']['translate-groupreview'] = true;
+$wgGroupPermissions['user']['translate-import'] = true;
+$wgGroupPermissions['sysop']['pagetranslation'] = true;
+$wgGroupPermissions['sysop']['translate-manage'] = true;
+$wgTranslateDocumentationLanguageCode = 'qqq';
+$wgExtraLanguageNames['qqq'] = 'Message documentation'; # No linguistic content. Used for documenting messages
+wfLoadExtension( 'UniversalLanguageSelector' );
 
 // # debug enable below this
 // $wgShowExceptionDetails = true;

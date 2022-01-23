@@ -151,7 +151,7 @@
       dest: /usr/local/bin/docker-compose
       mode: 755
 
-  - name: Shut Dwn existing PKC Service
+  - name: Shut Down existing PKC Service
     community.docker.docker_compose:
       project_src: cs
       state: absent

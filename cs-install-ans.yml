@@ -45,3 +45,7 @@
 
   - name: Changing perm of "cs-backup.sh", adding "+x"
     file: dest=./cs/cs-backup.sh mode=a+x
+
+  - name: Set Cronjob for mirorring 
+    cron: name=pkc_mirror special_time=monthly job="/usr/bin/certbot renew"
+    when: ansible_facts['os_family'] == "Debian"

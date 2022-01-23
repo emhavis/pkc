@@ -26,7 +26,7 @@ services:
     environment:
     - PMA_ARBITRARY=1
     - MYSQL_ROOT_PASSWORD=secret
-    - PMA_HOST=database
+    - PMA_HOST=database/
     - UPLOAD_LIMIT=123M
     - MAX_EXECUTION_TIME=125
     - HIDE_PHP_VERSION= 1

@@ -167,7 +167,8 @@ function export_images {
     docker exec -t xlp_mediawiki /bin/bash -c "$DOCKER_CMD"
 
     ## Push backup file here
-    DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed 's~mwstore://local-backend/local-public~./images~' | xargs cp -t /mnt/backup_restore/mediawiki/$_now"
+    # DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed 's~mwstore://local-backend/local-public~./images~' | xargs cp -t /mnt/backup_restore/mediawiki/$_now"
+    DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed -e '/\.\.\//d' -e "/'/d"  | xargs -n 1 cp /mnt/backup_restore/mediawiki/$_now"
     # echo $DOCKER_CMD
     docker exec -t xlp_mediawiki /bin/bash -c "$DOCKER_CMD"
 
