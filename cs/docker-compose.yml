@@ -74,7 +74,7 @@ services:
   mediawiki:
     # default username/password: admin/admin_on_d0cker
     # image: xlp0/semanticwiki
-    image: emhavis/pkc_semanticwiki:v0.2
+    image: emhavis/pkc_semanticwiki:v0.4
     container_name: xlp_mediawiki
     # platform: linux/amd64
     #

@@ -2,6 +2,8 @@
 #
 # Mediawiki Docker Deployment backup and archiving script for installations on Linux using MySQL.
 #
+# add dates on each files
+# 
 ################################################################################
 ## Output command usage
 function usage {

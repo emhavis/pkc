@@ -22,15 +22,15 @@
     - "code.{{ certbot_domain_name }}"
     - "kck.{{ certbot_domain_name }}"
 
-  # - name: copy Application Configuration Files
-  #   copy:
-  #     src: "{{ item.src }}"
-  #     dest: "{{ item.dest }}"
-  #     remote_src: false
-  #   loop:
-  #     - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
-  #     - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
-  #   become: true
+  - name: copy Application Configuration Files
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: false
+    loop:
+      - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
+      - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
+    become: true
 
   - name: Set Letsencrypt Cronjob for Certificate Auto Renewal
     cron: name=letsencrypt_renewal special_time=monthly job="/usr/bin/certbot renew"
