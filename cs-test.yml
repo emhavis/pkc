@@ -9,3 +9,80 @@
     ansible.builtin.unarchive:
       src: ./mountpoint.tar.gz
       dest: "{{ ansible_env.PWD }}/cs"
+
+  - name: Upload LocalSettings.php
+    copy:
+      src: "./config/LocalSettings.php"
+      dest: "./cs/mountpoint"
+      remote_src: false
+
+  - name: copy Application Configuration Files
+    copy:
+      src: "{{ item.src }}"
+      dest: "{{ item.dest }}"
+      remote_src: false
+    loop:
+      - {src: "./config/LocalSettings.php", dest: './cs/mountpoint'}
+      - {src: './config/config.ini.php', dest: './cs/mountpoint/matomo/config'}
+      - {src: './config/update-mtm-config.sql', dest: './cs/mountpoint/backup_restore/mariadb'}
+      - {src: './config/app.ini', dest: './cs/mountpoint/gitea/gitea/conf'}
+    become: true
+#
+# User data management
+#
+  - name: add user mtm
+    ansible.builtin.user:
+      name: mtm
+      comment: matomo docker account
+      uid: 1001
+      state: present
+
+  - name: add user www-data
+    ansible.builtin.user:
+      name: www-data
+      comment: matomo docker account
+      uid: 33
+      state: present
+
+  - name: Change Matomo Ownership Folder
+    ansible.builtin.file:
+      path: ./cs/mountpoint/matomo
+      state: directory
+      recurse: yes
+      owner: mtm
+#
+# Docker Compose Statement
+# 
+  - name: install docker compose    
+    get_url:
+      url: https://github.com/docker/compose/releases/download/1.27.3/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      mode: 755
+
+  - name: Shut Down existing PKC Service
+    community.docker.docker_compose:
+      project_src: cs
+      state: absent
+
+  - name: Create and start PKC services
+    community.docker.docker_compose:
+      project_src: cs
+    register: output
+
+  - name: Execute the Matomo Keycloak Config 
+    command: "sh {{ ansible_env.PWD }}/cs/mtm-sql.sh" 
+
+  - name: Execute the update script 
+    command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"
+#
+# Docker Post Installation, enable docker without sudo
+#
+  - name: Create group
+    group:
+      name: "docker"
+      state: present
+
+  - name: Adding user ubuntu
+    user: name=ubuntu
+          groups=docker
+          append=yes

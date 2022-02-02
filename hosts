@@ -1,1 +1,1 @@
-anindhaloka.org ansible_connection=ssh ansible_ssh_private_key_file=~/.ssh/aws-emhavisgmailcom.pem ansible_user=ubuntu domain=anindhaloka.org
+pkc-mirror.de ansible_connection=ssh ansible_ssh_private_key_file=~/.ssh/OregonCluster.pem ansible_user=ubuntu domain=pkc-mirror.de
