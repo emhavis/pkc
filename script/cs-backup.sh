@@ -42,7 +42,7 @@ function get_options {
     fi
 
     INSTALL_DIR=$(cd $INSTALL_DIR; pwd -P)
-    echo "Backing up CleanSlate mounted in $INSTALL_DIR"
+    echo "Backing up PKC mounted in $INSTALL_DIR"
 
     ## set to default destination backup folder
     BACKUP_DIR="${INSTALL_DIR}/backup_restore"
@@ -117,6 +117,7 @@ function get_localsettings_vars {
     DB_NAME=$(grep '^\$wgDBname' "$LOCALSETTINGS"  | cut -d\" -f2)
     DB_USER=$(grep '^\$wgDBuser' "$LOCALSETTINGS"  | cut -d\" -f2)
     DB_PASS=$(grep '^\$wgDBpassword' "$LOCALSETTINGS"  | cut -d\" -f2)
+    DOMAIN=
     echo "Logging in to MySQL as $DB_USER to $DB_HOST to backup $DB_NAME"
 
     # Try to extract default character set from LocalSettings.php
@@ -140,9 +141,9 @@ function export_sql {
 # --host=database --default-character-set=$DB_CHARSET \
 # --user=root --password=secret > /mnt/backup_restore/mariadb/${PREFIX}-database-${DB_CHARSET}.sql.gz; exit $?"
 
-    DOCKER_CMD="mysqldump --all-databases --single-transaction --host=database --user=root --password=secret | gzip > /mnt/backup_restore/mariadb/${PREFIX}-database.sql.gz; exit $?"
+    DOCKER_CMD="mysqldump --all-databases --single-transaction --host=${DB_HOST} --user=root --password=secret | gzip > /mnt/backup_restore/mariadb/${YOUR_DOMAIN}-${PREFIX}-database.sql.gz; exit $?"
 
-    # echo "Previewing docker command: $DOCKER_CMD"
+    echo "Previewing docker command: $DOCKER_CMD"
     docker exec -t xlp_mariadb /bin/bash -c "$DOCKER_CMD"
 
     # Ensure dump worked
@@ -160,7 +161,7 @@ function export_sql {
 ################################################################################
 ## Export the images directory
 function export_images {
-    IMG_BACKUP=$PREFIX"-images.tar.gz"
+    IMG_BACKUP=$YOUR_DOMAIN-$PREFIX"-images.tar.gz"
     echo "Compressing images to $IMG_BACKUP"
 
     ## Create new diretory
@@ -169,8 +170,8 @@ function export_images {
     docker exec -t xlp_mediawiki /bin/bash -c "$DOCKER_CMD"
 
     ## Push backup file here
-    # DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed 's~mwstore://local-backend/local-public~./images~' | xargs cp -t /mnt/backup_restore/mediawiki/$_now"
-    DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed -e '/\.\.\//d' -e "/'/d"  | xargs -n 1 cp /mnt/backup_restore/mediawiki/$_now"
+    DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed 's~mwstore://local-backend/local-public~./images~' | xargs cp -t /mnt/backup_restore/mediawiki/$_now"
+    # DOCKER_CMD="php /var/www/html/maintenance/dumpUploads.php | sed -e '/\.\.\//d' -e "/'/d"  | xargs -n 1 cp /mnt/backup_restore/mediawiki/$_now"
     # echo $DOCKER_CMD
     docker exec -t xlp_mediawiki /bin/bash -c "$DOCKER_CMD"
 
@@ -192,15 +193,20 @@ function export_images {
 
 # Preparation
 clear
+# get_options $@
 get_options $@
 get_localsettings_vars
 
 # temporary folder
 _now=$(date +"%m_%d_%Y_%H%M")
 
+# Get .env
+export $(cat .env | grep -v '#' | awk '/=/ {print $1}')
+
 BACKUP_PREFIX=$BACKUP_DIR/$PREFIX
-BACKUP_PREFIX_DB="${BACKUP_DIR}/mariadb/${PREFIX}"
-BACKUP_PREFIX_IMG="${BACKUP_DIR}/mediawiki/${PREFIX}"
+BACKUP_PREFIX_DB="${BACKUP_DIR}/mariadb/${YOUR_DOMAIN}-${PREFIX}"
+BACKUP_PREFIX_IMG="${BACKUP_DIR}/mediawiki/${YOUR_DOMAIN}-${PREFIX}"
+
 
 if [[ "$BASH_SOURCE" == "$0" ]];then
     toggle_read_only ON
