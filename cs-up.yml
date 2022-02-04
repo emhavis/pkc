@@ -143,6 +143,18 @@
       recurse: yes
       owner: mtm
 #
+# Docker Pre Installation, enable docker without sudo
+#
+  - name: Create group
+    group:
+      name: "docker"
+      state: present
+
+  - name: Adding user ubuntu
+    user: name=ubuntu
+          groups=docker
+          append=yes
+#
 # Docker Compose Statement
 # 
   - name: install docker compose    
@@ -166,15 +178,3 @@
 
   - name: Execute the update script 
     command: "sh {{ ansible_env.PWD }}/cs/update-sw.sh"
-#
-# Docker Post Installation, enable docker without sudo
-#
-  - name: Create group
-    group:
-      name: "docker"
-      state: present
-
-  - name: Adding user ubuntu
-    user: name=ubuntu
-          groups=docker
-          append=yes
